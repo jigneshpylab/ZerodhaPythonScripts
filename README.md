@@ -1,2 +1,2 @@
 # ZerodhaPythonScripts
-All scripts are in python language to trade in zerodha using algorithms.
+All scripts are in python language to get data from zerodha, do calculations and trade in zerodha using algorithms.
