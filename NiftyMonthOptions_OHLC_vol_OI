@@ -1,0 +1,93 @@
+from kiteconnect import KiteConnect
+import datetime
+import pandas as pd
+import sys
+import time
+userdata = pd.read_csv("C://db//loginkey//userdata.csv")
+print(sys._getframe().f_lineno, "userdata", userdata)
+
+allusers = len(userdata.index.values)
+print(sys._getframe().f_lineno, "allusers", allusers)
+
+kites= [None] * allusers
+print(sys._getframe().f_lineno, "kites", kites)
+
+for i in range(0,allusers):
+        try:
+            api_key = userdata.loc[i, "api_key"]
+            api_secret = userdata.loc[i, "api_secret"]
+            request_token = userdata.loc[i, "request_token"]
+            access_token = userdata.loc[i, "access_token"]
+            public_token = userdata.loc[i, "public_token"]
+            kitei = KiteConnect(api_key=api_key)
+            kitei.set_access_token(access_token)
+            kites[i] = kitei
+        except Exception as e:
+            print(" ERROR in api_key",i , e, datetime.datetime.now())
+print(sys._getframe().f_lineno, "kites", kites)
+
+print(sys._getframe().f_lineno, "user data loaded..........", datetime.datetime.now())
+
+
+df_opinst = pd.read_csv("https://api.kite.trade/instruments")
+df_opinst = df_opinst[df_opinst['tradingsymbol'].str.startswith("NIFTY20")]
+df_opinst = df_opinst[df_opinst['segment'] == "NFO-OPT"]
+df_opinst['expiry'] = pd.to_datetime(df_opinst['expiry'])
+month = datetime.datetime.today().month
+monthly_expdate = [30, 27, 26, 30, 28, 25, 30, 27, 24, 29, 26, 31]  # last date each month
+exp_date = monthly_expdate[datetime.datetime.today().month - 1]  # -1 as index start from 0 and month from 1
+exp_date = '2020-{}-{}'.format(month, exp_date)
+exp_date = datetime.datetime.strptime(exp_date, '%Y-%m-%d')
+df_opinst = df_opinst[~(df_opinst['expiry'] > exp_date + datetime.timedelta(days=2))]
+df_opinst = df_opinst[(df_opinst['expiry'] > exp_date - datetime.timedelta(days=2))]
+print("expiry date ", df_opinst,df_opinst.columns.values)
+
+NSELTPformate=['NFO:{}'.format(i) for i in df_opinst.tradingsymbol.values]
+OHLCdict = kites[0].quote(NSELTPformate)
+print(OHLCdict)
+
+df = pd.DataFrame(columns=['tradingsymbol', 'instrument_token', 'timestamp', 'last_price', 'open', 'high', 'low', 'close', 'volume', 'oi'])
+
+print("Waiting to get open price..........", datetime.datetime.now())
+opentime = int(9) * 60 + int(15)
+closetime = int(15) * 60 + int(30)
+timenow = (datetime.datetime.now().hour * 60 + datetime.datetime.now().minute)
+while timenow < opentime:
+    time.sleep(2)
+    timenow = (datetime.datetime.now().hour * 60 + datetime.datetime.now().minute)
+
+keep_running = True
+while keep_running :
+        try :
+            dfi = pd.DataFrame(columns=['tradingsymbol', 'instrument_token', 'timestamp', 'last_price', 'open', 'high', 'low', 'close',
+                         'volume', 'oi'])
+            for key, value in OHLCdict.items():
+                try:
+                    tradingsymbol = key.split(":")[1]
+                    instrument_token = value['instrument_token']
+                    timestamp = value['timestamp']
+                    last_price = value['last_price']
+                    volume = value['volume']
+                    oi = value['oi']
+                    value2 = value['ohlc']
+                    open = value2['open']
+                    high = value2['high']
+                    low = value2['low']
+                    close = value2['close']
+                    #print(tradingsymbol, instrument_token, last_price, open, high, low, close)
+                    dfi.loc[len(dfi)] = [tradingsymbol, instrument_token, timestamp, last_price, open, high, low, close,
+                                         volume, oi]
+                    df = df.append(dfi, ignore_index=True)
+                    df.to_csv("C://db//options//JAN2020.csv")
+                    print(len(df),datetime.datetime.now())
+                    time.sleep(3)
+                except Exception as e:
+                    print(e)
+            timenow = (datetime.datetime.now().hour * 60 + datetime.datetime.now().minute)
+            if timenow > closetime :
+                print("Time is above closetime")
+                keep_running = False
+                print("keep_running = ", keep_running)
+
+        except Exception as e:
+            print("ERROR", e)
