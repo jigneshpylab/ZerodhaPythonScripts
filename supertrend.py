@@ -236,7 +236,7 @@ def run_trategy():
                 target = int(100 * (floor(target / 0.05) * 0.05)) / 100
 
                 orderslist.append(tickerlist[i])
-                order = kites[i].place_order(exchange='NSE',
+                order = kites[0].place_order(exchange='NSE',
                                              tradingsymbol=tickerlist[i],
                                              transaction_type="BUY",
                                              quantity=quantity,
