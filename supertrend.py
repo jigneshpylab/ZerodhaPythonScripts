@@ -217,7 +217,7 @@ def run_trategy():
             lastclose = histdata.close.values[-1]
             stoploss = histdata.low.values[-3] # third last candle as stoploss
 
-            if stoploss < lastclose * 0.994:
+            if stoploss > lastclose * 0.994:
                 stoploss = lastclose * 0.994 # minimum stoploss as 0.4 %
 
             #print("lastclose",lastclose)
