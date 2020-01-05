@@ -220,8 +220,8 @@ def run_trategy():
             if stoploss < lastclose * 0.994:
                 stoploss = lastclose * 0.994 # minimum stoploss as 0.4 %
 
-            print("lastclose",lastclose)
-            print("stoploss abs",stoploss)
+            #print("lastclose",lastclose)
+            #print("stoploss abs",stoploss)
 
             if super_trend[-1]=='up' and super_trend[-2]=='down':
                 stoploss = lastclose - stoploss
