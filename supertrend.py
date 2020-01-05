@@ -210,7 +210,7 @@ def run_trategy():
         if (i in orderslist):
             continue
         try:
-            print("tickerlist", tickerlist[i])
+            print("\ntickerlist", tickerlist[i])
             histdata = gethistoricaldata(tokenlist[i])
             #print(histdata)
             super_trend = histdata.STX.values
@@ -225,7 +225,7 @@ def run_trategy():
 
             if super_trend[-1]=='up' and super_trend[-2]=='down':
                 stoploss = lastclose - stoploss
-                print("stoploss delta", stoploss)
+                #print("stoploss delta", stoploss)
 
                 quantity = floor(max(1, (risk_per_trade/stoploss)))
                 target = stoploss*3 # risk reward as 3
