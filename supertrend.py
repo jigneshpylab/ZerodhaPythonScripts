@@ -223,7 +223,7 @@ def run_trategy():
             #print("lastclose",lastclose)
             #print("stoploss abs",stoploss)
 
-            if super_trend[-1]=='up' and super_trend[-2]=='down':
+            if super_trend[-1]=='up' and (super_trend[-2]=='down' or super_trend[-3]=='down'):
                 stoploss = lastclose - stoploss
                 #print("stoploss delta", stoploss)
 
@@ -258,9 +258,9 @@ def run_trategy():
 
 def run():
     global runcount
-    start_time = int(6) * 60 + int(24)  # specify in int (hr) and int (min) foramte
+    start_time = int(9) * 60 + int(24)  # specify in int (hr) and int (min) foramte
     end_time = int(15) * 60 + int(10)  # do not place fresh order
-    stop_time = int(15) * 60 + int(15)  # square off all open positions
+    stop_time = int(15) * 60 + int(15)  
     last_time = start_time
     schedule_interval = 180  # run at every 3 min
     #runcount = 0
