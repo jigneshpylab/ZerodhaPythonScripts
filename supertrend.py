@@ -21,7 +21,12 @@ mainuser = userdata.head(1)["user"].values[0]
 allusers = len(userdata.index.values)
 kites = [None] * allusers
 
-risk_per_trade = 500 # if stoploss gets triggers, you loss will be this, trade quantity will be calculated based on this
+risk_per_trade = 100 # if stoploss gets triggers, you loss will be this, trade quantity will be calculated based on this
+supertrend_period = 17
+supertrend_multiplier=3
+candlesize = '5minute'
+
+
 
 for i in range(0, allusers):
     try:
@@ -103,7 +108,7 @@ def ATR(df, period, ohlc=['open', 'high', 'low', 'close']):
 
     return df
 
-def SuperTrend(df, period = 17, multiplier=1.4, ohlc=['open', 'high', 'low', 'close']):
+def SuperTrend(df, period = supertrend_period, multiplier=supertrend_multiplier, ohlc=['open', 'high', 'low', 'close']):
     """
     Function to compute SuperTrend
 
@@ -190,7 +195,7 @@ def gethistoricaldata(token):
     startdate = enddate - datetime.timedelta(10)
     df = pd.DataFrame(columns=['date', 'open', 'high', 'low', 'close', 'volume'])
     try:
-        data = kites[0].historical_data(token, startdate, enddate, interval='3minute')
+        data = kites[0].historical_data(token, startdate, enddate, interval=candlesize)
         df = pd.DataFrame.from_dict(data, orient='columns', dtype=None)
         #print(df)
         if not df.empty:
@@ -210,28 +215,31 @@ def run_trategy():
         if (i in orderslist):
             continue
         try:
-            print("\ntickerlist", tickerlist[i])
             histdata = gethistoricaldata(tokenlist[i])
             #print(histdata)
             super_trend = histdata.STX.values
             lastclose = histdata.close.values[-1]
-            stoploss = histdata.low.values[-3] # third last candle as stoploss
+            stoploss_buy = histdata.low.values[-3] # third last candle as stoploss
+            stoploss_sell = histdata.high.values[-3] # third last candle as stoploss
 
-            if stoploss > lastclose * 0.994:
-                stoploss = lastclose * 0.994 # minimum stoploss as 0.4 %
+            if stoploss_buy > lastclose * 0.996:
+                stoploss_buy = lastclose * 0.996 # minimum stoploss as 0.4 %
 
+            if stoploss_sell < lastclose * 1.004:
+                stoploss_sell = lastclose * 1.004 # minimum stoploss as 0.4 %
             #print("lastclose",lastclose)
             #print("stoploss abs",stoploss)
+            print(tickerlist[i],lastclose,super_trend[-4:])
 
-            if super_trend[-1]=='up' and (super_trend[-2]=='down' or super_trend[-3]=='down'):
-                stoploss = lastclose - stoploss
+            if super_trend[-1]=='up' and super_trend[-3]=='down' and super_trend[-4]=='down' and super_trend[-5]=='down' and super_trend[-6]=='down':
+                stoploss_buy = lastclose - stoploss_buy
                 #print("stoploss delta", stoploss)
 
-                quantity = floor(max(1, (risk_per_trade/stoploss)))
-                target = stoploss*3 # risk reward as 3
+                quantity = floor(max(1, (risk_per_trade/stoploss_buy)))
+                target = stoploss_buy*3 # risk reward as 3
 
                 price = int(100 * (floor(lastclose / 0.05) * 0.05)) / 100
-                stoploss = int(100 * (floor(stoploss / 0.05) * 0.05)) / 100
+                stoploss_buy = int(100 * (floor(stoploss_buy / 0.05) * 0.05)) / 100
                 quantity = int(quantity)
                 target = int(100 * (floor(target / 0.05) * 0.05)) / 100
 
@@ -247,20 +255,51 @@ def run_trategy():
                                              trigger_price='0',
                                              # disclosed_quantity=None,
                                              squareoff=target,
-                                             stoploss=stoploss,
+                                             stoploss=stoploss_buy,
                                              #trailing_stoploss=trailing_loss,
                                              variety="bo"
                                              )
-                print("         Order : ", "BUY", tickerlist[i], "quantity:",quantity, "target:",target, "stoploss:",stoploss,datetime.datetime.now())
+                print("         Order : ", "BUY", tickerlist[i], "quantity:",quantity, "target:",target, "stoploss:",stoploss_buy,datetime.datetime.now())
+
+            if super_trend[-1]=='down' and super_trend[-3]=='up' and super_trend[-4]=='up' and super_trend[-5]=='up' and super_trend[-6]=='up':
+
+                stoploss_sell= stoploss_sell - lastclose
+                #print("stoploss delta", stoploss)
+
+                quantity = floor(max(1, (risk_per_trade/stoploss_sell)))
+                target = stoploss_sell*3 # risk reward as 3
+
+                price = int(100 * (floor(lastclose / 0.05) * 0.05)) / 100
+                stoploss_sell = int(100 * (floor(stoploss_sell / 0.05) * 0.05)) / 100
+                quantity = int(quantity)
+                target = int(100 * (floor(target / 0.05) * 0.05)) / 100
+
+                orderslist.append(tickerlist[i])
+                order = kites[0].place_order(exchange='NSE',
+                                             tradingsymbol=tickerlist[i],
+                                             transaction_type="SELL",
+                                             quantity=quantity,
+                                             price=price,
+                                             product='MIS',
+                                             order_type='LIMIT',
+                                             validity='DAY',
+                                             trigger_price='0',
+                                             # disclosed_quantity=None,
+                                             squareoff=target,
+                                             stoploss=stoploss_sell,
+                                             #trailing_stoploss=trailing_loss,
+                                             variety="bo"
+                                             )
+                print("         Order : ", "SELL", tickerlist[i], "quantity:",quantity, "target:",target, "stoploss:",stoploss_sell,datetime.datetime.now())
 
         except Exception as e :
             print(e)
 
 def run():
     global runcount
-    start_time = int(9) * 60 + int(24)  # specify in int (hr) and int (min) foramte
+    start_time = int(9) * 60 + int(18)  # specify in int (hr) and int (min) foramte
     end_time = int(15) * 60 + int(10)  # do not place fresh order
-    stop_time = int(15) * 60 + int(15)  
+    stop_time = int(15) * 60 + int(15)  # square off all open positions
     last_time = start_time
     schedule_interval = 180  # run at every 3 min
     #runcount = 0
