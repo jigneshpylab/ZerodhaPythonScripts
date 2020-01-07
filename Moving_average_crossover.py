@@ -126,7 +126,7 @@ def run():
     end_time = int(15) * 60 + int(10)  # do not place fresh order
     stop_time = int(15) * 60 + int(15)  # square off all open positions
     last_time = start_time
-    schedule_interval = 10  # run at every 3 min
+    schedule_interval = 180  # run at every 3 min
 
     while True:
         if (datetime.datetime.now().hour * 60 + datetime.datetime.now().minute) >= end_time:
