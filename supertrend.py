@@ -22,7 +22,7 @@ allusers = len(userdata.index.values)
 kites = [None] * allusers
 
 risk_per_trade = 100 # if stoploss gets triggers, you loss will be this, trade quantity will be calculated based on this
-supertrend_period = 17
+supertrend_period = 30
 supertrend_multiplier=3
 candlesize = '5minute'
 
