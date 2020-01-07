@@ -212,7 +212,7 @@ orderslist = []
 def run_trategy():
     for i in range(0, len(tickerlist)):
 
-        if (i in orderslist):
+        if (tickerlist[i] in orderslist):
             continue
         try:
             histdata = gethistoricaldata(tokenlist[i])
@@ -297,7 +297,7 @@ def run_trategy():
 
 def run():
     global runcount
-    start_time = int(9) * 60 + int(18)  # specify in int (hr) and int (min) foramte
+    start_time = int(9) * 60 + int(30)  # specify in int (hr) and int (min) foramte
     end_time = int(15) * 60 + int(10)  # do not place fresh order
     stop_time = int(15) * 60 + int(15)  # square off all open positions
     last_time = start_time
