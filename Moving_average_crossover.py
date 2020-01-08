@@ -45,7 +45,7 @@ def gethistoricaldata(token):
 
 orderslist = []
 def run_trategy():
-    for i in range(0, 10): #len(tickerlist)):
+    for i in range(0, len(tickerlist)):
         if (tickerlist[i] in orderslist):
             continue
         try:
