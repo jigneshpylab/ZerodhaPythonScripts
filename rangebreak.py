@@ -13,7 +13,7 @@ risk_per_trade = 100 # if stoploss gets triggers, you loss will be this, trade q
 tickerlist = ["HDFCBANK","LT","HDFC","ICICIBANK","LICHSGFIN"] # you can keep any number of stocks, symbol must match with zerodha trading symbol
 NSELTPformat=['NSE:{}'.format(i) for i in tickerlist]
 
-orderplacetime = int(9) * 60 + int(6) # as int(hr) +60 * int(min):
+orderplacetime = int(9) * 60 + int(40) # as int(hr) +60 * int(min):
 
 timenow = (datetime.datetime.now().hour * 60 + datetime.datetime.now().minute)
 print("\nWaiting for time 9:30..........", datetime.datetime.now())
