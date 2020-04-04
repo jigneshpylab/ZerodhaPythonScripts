@@ -92,8 +92,11 @@ while orderplaced == False :
                                                 variety="regular"
                                                 )
                     print("Order  Placed : ", signal, tradingsymbol_nifty_future, "LTP", LTP,'orderid',orderid, datetime.datetime.now())
+                    orderplaced = True
+
             except Exception as e:
                     print(e)
+                    
             break # break while loop once order is placed
     except Exception as e:
         print(e)
