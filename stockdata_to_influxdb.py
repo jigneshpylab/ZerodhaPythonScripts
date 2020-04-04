@@ -7,7 +7,21 @@ from influxdb import InfluxDBClient
 
 """
 1. connect to influx database
+
+For one time setup
+Downlonad influxdb files from https://dl.influxdata.com/influxdb/releases/influxdb-1.7.10_windows_amd64.zip
+extract zip file and start influxd.exe
+influxd.exe should be kept running to use influxdb
+
+db  = InfluxDBClient(host="localhost", port = 8086)
+db.create_database('tickerdb')
+
+
 """
+
+
+
+
 db  = InfluxDBClient(host="localhost", port = 8086)
 #db.drop_database(dbname='tickerdb')
 #db.create_database('tickerdb') # if running first time, remove # to create new database
