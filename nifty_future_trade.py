@@ -11,7 +11,7 @@ access_token = "your access_token"
 kite = KiteConnect(api_key=api_key)
 kite.set_access_token(access_token)
 """
-2. Get instrument token from near month nifty future
+2. Get instrument token of near month nifty future
 """
 print("Downloading instrument tokens..........", datetime.datetime.now())
 df = pd.read_csv("https://api.kite.trade/instruments")
