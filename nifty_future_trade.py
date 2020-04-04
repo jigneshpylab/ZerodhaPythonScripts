@@ -35,10 +35,10 @@ print("tradingsymbol_nifty_future",tradingsymbol_nifty_future)
 def get_signal(data=None):
     """
     you need to implement your idea to generate buy or sell signal from given data.
-    signal can be from any logic, e.g. convectional technical analysis or price action or machine learning or any other.
+    signal can be from any logic, e.g. conventional technical analysis or price-action or machine learning or any other.
 
     :param data: data can be any values required for your strategy calculations
-    :return: "buy" or "sell or None
+    :return: "BUY" or "SELL or None
     """
     # sample logic, data in LTP in this sample
     LTP = data
