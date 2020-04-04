@@ -50,7 +50,7 @@ def get_signal(data=None):
     return  signal
 
 """
-4. set your logic to buy or sell
+4. set trade time
 """
 opentime = int(9) * 60 + int(16)
 closetime = int(15) * 60 + int(30)
